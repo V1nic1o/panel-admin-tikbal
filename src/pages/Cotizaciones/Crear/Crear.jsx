@@ -1,3 +1,4 @@
+// ✅ Archivo completo con fix aplicado en la descarga del PDF
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
@@ -66,17 +67,22 @@ export default function CrearCotizacion() {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
+      // ✅ 🔽 Versión ajustada con fetch
       try {
-        const response = await api.get(`/cotizaciones/pdf/${cotizacionId}`, {
-          responseType: 'blob'
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cotizaciones/pdf/${cotizacionId}`, {
+          method: 'GET'
         });
 
-        const blob = response.data;
+        if (!response.ok) throw new Error('Fallo al descargar el PDF');
+
+        const blob = await response.blob();
         const nombreArchivo = `cotizacion-${cliente.nombre.replace(/\s+/g, '_')}.pdf`;
         const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
+        link.href = URL.createObjectURL(blob);
         link.download = nombreArchivo;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       } catch (pdfError) {
         console.error('❌ Error al descargar el PDF:', pdfError.message);
         setMensaje('⚠️ Cotización guardada, pero falló la descarga del PDF');

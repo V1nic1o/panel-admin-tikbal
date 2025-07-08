@@ -2,7 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
-import { FaHome, FaPlus, FaFilePdf, FaPen, FaTrash } from 'react-icons/fa';
+import {
+  FaHome,
+  FaPlus,
+  FaFilePdf,
+  FaPen,
+  FaTrash,
+  FaSpinner,
+} from 'react-icons/fa';
 
 export default function Historial() {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -13,15 +20,19 @@ export default function Historial() {
     fechaHasta: ''
   });
   const [mensaje, setMensaje] = useState('');
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
   const obtenerCotizaciones = async () => {
+    setCargando(true);
     try {
       const res = await api.get('/cotizaciones', { params: filtros });
       setCotizaciones(res.data);
       setMensaje('');
     } catch (err) {
       setMensaje('❌ Error al cargar cotizaciones');
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -30,6 +41,7 @@ export default function Historial() {
   }, []);
 
   const handleDescargarPDF = async (id, nombreCliente) => {
+    setCargando(true);
     try {
       const response = await api.get(`/cotizaciones/pdf/${id}`, {
         responseType: 'blob'
@@ -49,22 +61,27 @@ export default function Historial() {
         console.error('Error al descargar el PDF:', error);
         setMensaje('❌ Error inesperado al generar el PDF.');
       }
+    } finally {
+      setCargando(false);
     }
   };
 
   const actualizarEstado = async (id, nuevoEstado) => {
+    setCargando(true);
     try {
       await api.put(`/cotizaciones/estado/${id}`, { estado: nuevoEstado });
       setMensaje('✅ Estado actualizado correctamente');
       obtenerCotizaciones();
     } catch (err) {
       setMensaje('❌ Error al actualizar el estado');
+      setCargando(false);
     }
   };
 
   const eliminarCotizacion = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar esta cotización?')) return;
 
+    setCargando(true);
     try {
       await api.delete(`/cotizaciones/${id}`);
       setMensaje('🗑️ Cotización eliminada correctamente');
@@ -72,11 +89,18 @@ export default function Historial() {
     } catch (err) {
       console.error(err);
       setMensaje('❌ Error al eliminar la cotización');
+      setCargando(false);
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 relative">
+      {cargando && (
+        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
+          <FaSpinner className="animate-spin text-5xl text-blue-800" />
+        </div>
+      )}
+
       <h2 className="text-3xl font-bold text-center mb-6">Historial de Cotizaciones</h2>
 
       <div className="grid md:grid-cols-5 gap-4 mb-6 bg-white p-4 rounded shadow">
@@ -113,7 +137,7 @@ export default function Historial() {
           onClick={obtenerCotizaciones}
           className="bg-blue-600 text-white rounded px-3 py-1 hover:bg-blue-700 flex items-center justify-center gap-2"
         >
-          🔍 Filtrar
+          🔍 Buscar
         </button>
       </div>
 
