@@ -1,22 +1,28 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
+import ControlWeb from './pages/Dashboard/ControlWeb';
 import Servicios from './pages/Servicios/Servicios';
 import Proyectos from './pages/Proyectos/Proyectos';
 import Mensajes from './pages/Mensajes/Mensajes';
 import Login from './pages/Auth/Login';
 import ProtectedRoute from './routes/ProtectedRoute';
-import { LoaderProvider } from './services/LoaderContext'; // 🧠 nuevo contexto
+import { LoaderProvider } from './services/LoaderContext';
+
+// ✅ Vistas del módulo Cotizaciones
+import ControlCotizaciones from './pages/Cotizaciones/Control/ControlCotizaciones';
+import Crear from './pages/Cotizaciones/Crear/Crear';
+import Editar from './pages/Cotizaciones/Editar/Editar';
+import Historial from './pages/Cotizaciones/Historial/Historial';
 
 function App() {
   return (
-    <LoaderProvider> {/* 🔄 provee acceso al loader global */}
+    <LoaderProvider>
       <Routes>
-        {/* Ruta pública */}
+        {/* 🔓 Ruta pública */}
         <Route path="/login" element={<Login />} />
 
-        {/* Rutas protegidas */}
+        {/* 🔐 Rutas protegidas */}
         <Route
           path="/"
           element={
@@ -27,12 +33,19 @@ function App() {
         >
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="control-web" element={<ControlWeb />} />
           <Route path="servicios" element={<Servicios />} />
           <Route path="proyectos" element={<Proyectos />} />
           <Route path="mensajes" element={<Mensajes />} />
+
+          {/* ✅ Ruta intermedia con cartas */}
+          <Route path="cotizaciones" element={<ControlCotizaciones />} />
+          <Route path="cotizaciones/crear" element={<Crear />} />
+          <Route path="cotizaciones/editar/:id" element={<Editar />} />
+          <Route path="cotizaciones/historial" element={<Historial />} />
         </Route>
 
-        {/* Fallback si ruta no existe */}
+        {/* 🚧 Fallback para rutas no válidas */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </LoaderProvider>

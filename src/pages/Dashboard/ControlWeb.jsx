@@ -1,28 +1,34 @@
 import { useNavigate } from 'react-router-dom';
-import { FaGlobe, FaMoneyBillWave } from 'react-icons/fa';
+import { FaTools, FaFolderOpen, FaEnvelopeOpenText } from 'react-icons/fa';
 
-export default function Dashboard() {
+export default function ControlWeb() {
   const navigate = useNavigate();
 
   const cards = [
     {
-      title: 'Control de Página Web',
-      description: 'Editar contenido visual de la web pública',
-      icon: <FaGlobe className="text-4xl text-blue-800" />,
-      route: '/control-web',
+      title: 'Servicios',
+      description: 'Gestionar los servicios que se muestran en la web',
+      icon: <FaTools className="text-4xl text-green-700" />,
+      route: '/servicios',
     },
     {
-      title: 'Gestión de Cotizaciones',
-      description: 'Crear, editar y administrar cotizaciones',
-      icon: <FaMoneyBillWave className="text-4xl text-green-700" />,
-      route: '/cotizaciones',
+      title: 'Proyectos',
+      description: 'Subir y ordenar proyectos del portafolio',
+      icon: <FaFolderOpen className="text-4xl text-indigo-700" />,
+      route: '/proyectos',
+    },
+    {
+      title: 'Mensajes',
+      description: 'Leer los mensajes enviados por los visitantes',
+      icon: <FaEnvelopeOpenText className="text-4xl text-red-700" />,
+      route: '/mensajes',
     },
   ];
 
   return (
     <div className="min-h-screen px-6 py-12 bg-gradient-to-br from-[#f4f4f4] to-[#dbccc1]">
       <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10">
-        Panel de Administración
+        Secciones de Página Web
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
