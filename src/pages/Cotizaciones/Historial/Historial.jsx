@@ -246,7 +246,7 @@ export default function Historial() {
 
       <div className="fixed bottom-6 right-6 flex flex-col gap-4">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/cotizaciones')}
           title="Ir a inicio"
           className="bg-gray-300 hover:bg-gray-400 rounded-full p-3 shadow"
         >

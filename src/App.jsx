@@ -1,55 +1,87 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import AdminLayout from './layouts/AdminLayout';
-import Dashboard from './pages/Dashboard/Dashboard';
-import ControlWeb from './pages/Dashboard/ControlWeb';
-import Servicios from './pages/Servicios/Servicios';
-import Proyectos from './pages/Proyectos/Proyectos';
-import Mensajes from './pages/Mensajes/Mensajes';
-import Login from './pages/Auth/Login';
-import ProtectedRoute from './routes/ProtectedRoute';
-import { LoaderProvider } from './services/LoaderContext';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import {
+  HiHome,
+  HiArrowLeft,
+  HiLogout,
+} from 'react-icons/hi';
+import clsx from 'clsx';
 
-// ✅ Vistas del módulo Cotizaciones
-import ControlCotizaciones from './pages/Cotizaciones/Control/ControlCotizaciones';
-import Crear from './pages/Cotizaciones/Crear/Crear';
-import Editar from './pages/Cotizaciones/Editar/Editar';
-import Historial from './pages/Cotizaciones/Historial/Historial';
+export default function AdminLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-function App() {
+  const cerrarSesion = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
+  const goBack = () => {
+    if (location.pathname !== '/dashboard') {
+      navigate(-1);
+    }
+  };
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <LoaderProvider>
-      <Routes>
-        {/* 🔓 Ruta pública */}
-        <Route path="/login" element={<Login />} />
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Header que cambia de posición en móviles */}
+      <header
+        className={clsx(
+          `fixed z-50 w-[95%] max-w-[95%] sm:max-w-max
+          bg-gradient-to-r from-[#0b3e7a] to-[#5a7f8c] text-white shadow-2xl backdrop-blur-md
+          border border-white/20 rounded-full px-4 py-3
+          flex items-center justify-center sm:justify-start gap-4
+          text-sm font-medium transition-all duration-500`,
+          // ✅ Posición top en desktop, bottom en móvil
+          'left-1/2 transform -translate-x-1/2',
+          'top-4 sm:top-4 sm:bottom-auto',
+          'bottom-4 sm:bottom-auto'
+        )}
+      >
+        {/* Logo */}
+        <span className="font-bold text-base sm:text-lg select-none">Tikb’al</span>
 
-        {/* 🔐 Rutas protegidas */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="control-web" element={<ControlWeb />} />
-          <Route path="servicios" element={<Servicios />} />
-          <Route path="proyectos" element={<Proyectos />} />
-          <Route path="mensajes" element={<Mensajes />} />
+        {/* Botones */}
+        <nav className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+          <button
+            onClick={goBack}
+            title="Regresar"
+            className="flex items-center gap-2 px-3 py-1 rounded-md hover:text-white/80 transition-all"
+          >
+            <HiArrowLeft className="text-lg" />
+            <span className="hidden sm:inline">Regresar</span>
+          </button>
 
-          {/* ✅ Ruta intermedia con cartas */}
-          <Route path="cotizaciones" element={<ControlCotizaciones />} />
-          <Route path="cotizaciones/crear" element={<Crear />} />
-          <Route path="cotizaciones/editar/:id" element={<Editar />} />
-          <Route path="cotizaciones/historial" element={<Historial />} />
-        </Route>
+          <button
+            onClick={() => navigate('/dashboard')}
+            title="Ir a Inicio"
+            className={clsx(
+              'flex items-center gap-2 px-3 py-1 rounded-md transition-all',
+              isActive('/dashboard')
+                ? 'bg-white/20 text-white font-semibold'
+                : 'hover:text-white/80 text-white'
+            )}
+          >
+            <HiHome className="text-lg" />
+            <span className="hidden sm:inline">Inicio</span>
+          </button>
 
-        {/* 🚧 Fallback para rutas no válidas */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </LoaderProvider>
+          <button
+            onClick={cerrarSesion}
+            title="Cerrar sesión"
+            className="flex items-center gap-2 px-3 py-1 text-red-200 hover:text-red-400 transition-all"
+          >
+            <HiLogout className="text-lg" />
+            <span className="hidden sm:inline">Cerrar sesión</span>
+          </button>
+        </nav>
+      </header>
+
+      {/* Main con padding top y bottom para que no quede tapado */}
+      <main className="pt-32 pb-32 px-4 sm:px-6 max-w-screen-xl mx-auto w-full">
+        <Outlet />
+      </main>
+    </div>
   );
 }
-
-export default App;
