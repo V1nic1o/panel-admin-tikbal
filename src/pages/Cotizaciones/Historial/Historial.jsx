@@ -1,4 +1,3 @@
-// src/pages/Cotizaciones/Historial/Historial.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
@@ -43,17 +42,19 @@ export default function Historial() {
   const handleDescargarPDF = async (id, nombreCliente) => {
     setCargando(true);
     try {
-      const response = await api.get(`/cotizaciones/pdf/${id}`, {
-        responseType: 'blob'
-      });
+      const res = await api.get(`/cotizaciones/pdf/${id}`);
+      const pdfURL = res.data.url; // URL devuelta desde el backend
 
-      const blob = response.data;
+      const response = await fetch(pdfURL);
+      const blob = await response.blob();
       const nombreArchivo = `cotizacion-${nombreCliente.replace(/\s+/g, '_')}.pdf`;
 
       const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
+      link.href = URL.createObjectURL(blob);
       link.download = nombreArchivo;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     } catch (error) {
       if (error.response?.status === 400) {
         setMensaje('⚠️ La cotización está incompleta. No se puede generar el PDF.');

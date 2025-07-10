@@ -1,4 +1,3 @@
-// ✅ Archivo completo con fix aplicado en la descarga del PDF
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
@@ -67,19 +66,17 @@ export default function CrearCotizacion() {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // ✅ 🔽 Versión ajustada con fetch
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cotizaciones/pdf/${cotizacionId}`, {
-          method: 'GET'
-        });
+        const res = await api.get(`/cotizaciones/pdf/${cotizacionId}`);
+        const pdfURL = res.data.url;
 
-        if (!response.ok) throw new Error('Fallo al descargar el PDF');
-
+        const nombreDesdeURL = pdfURL.split('/').pop(); // cotizacion-123-cliente.pdf
+        const response = await fetch(pdfURL);
         const blob = await response.blob();
-        const nombreArchivo = `cotizacion-${cliente.nombre.replace(/\s+/g, '_')}.pdf`;
+
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = nombreArchivo;
+        link.download = nombreDesdeURL || 'cotizacion.pdf';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
