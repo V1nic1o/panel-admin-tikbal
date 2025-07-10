@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { FaGlobe, FaMoneyBillWave } from 'react-icons/fa';
+import Lottie from 'lottie-react';
+
+import controlWebAnim from '../../assets/animations/control web.json';
+import cotizacionesAnim from '../../assets/animations/cotizaciones.json';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -8,13 +11,13 @@ export default function Dashboard() {
     {
       title: 'Control de Página Web',
       description: 'Editar contenido visual de la web pública',
-      icon: <FaGlobe className="text-4xl text-blue-800" />,
+      animation: controlWebAnim,
       route: '/control-web',
     },
     {
       title: 'Gestión de Cotizaciones',
       description: 'Crear, editar y administrar cotizaciones',
-      icon: <FaMoneyBillWave className="text-4xl text-green-700" />,
+      animation: cotizacionesAnim,
       route: '/cotizaciones',
     },
   ];
@@ -30,10 +33,14 @@ export default function Dashboard() {
           <div
             key={i}
             onClick={() => navigate(card.route)}
-            className="cursor-pointer bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl border border-gray-200 hover:border-blue-500 transition-all duration-300 group"
+            className="cursor-pointer bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl border border-gray-200 hover:border-blue-500 transition-all duration-300 group flex flex-col items-center"
           >
-            <div className="flex items-center justify-center mb-4">
-              {card.icon}
+            <div className="flex items-center justify-center w-full mb-6">
+              <Lottie
+                animationData={card.animation}
+                loop
+                className="w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60"
+              />
             </div>
             <h2 className="text-xl font-semibold text-gray-800 group-hover:text-blue-800 mb-2 text-center">
               {card.title}
