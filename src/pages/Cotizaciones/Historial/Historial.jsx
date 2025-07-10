@@ -1,3 +1,4 @@
+// src/pages/Cotizaciones/Historial/Historial.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
@@ -8,6 +9,7 @@ import {
   FaPen,
   FaTrash,
   FaSpinner,
+  FaWhatsapp,
 } from 'react-icons/fa';
 
 export default function Historial() {
@@ -43,7 +45,7 @@ export default function Historial() {
     setCargando(true);
     try {
       const res = await api.get(`/cotizaciones/pdf/${id}`);
-      const pdfURL = res.data.url; // URL devuelta desde el backend
+      const pdfURL = res.data.url;
 
       const response = await fetch(pdfURL);
       const blob = await response.blob();
@@ -62,6 +64,36 @@ export default function Historial() {
         console.error('Error al descargar el PDF:', error);
         setMensaje('❌ Error inesperado al generar el PDF.');
       }
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleEnviarWhatsApp = async (id, nombreCliente, telefono) => {
+    const numeroLimpio = (telefono || '').toString().replace(/\D/g, '');
+    console.log('☎️ Número limpio:', numeroLimpio);
+
+    if (!numeroLimpio || numeroLimpio.length < 8) {
+      console.warn('⚠️ Número no válido');
+      setMensaje('⚠️ Este cliente no tiene un número válido para WhatsApp.');
+      return;
+    }
+
+    setCargando(true);
+    try {
+      const res = await api.get(`/cotizaciones/pdf/${id}`);
+      const pdfURL = res.data.url;
+
+      const mensaje = `Hola ${nombreCliente}, te comparto la cotización solicitada: ${pdfURL}`;
+      const whatsappURL = `https://wa.me/502${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+
+      console.log('📩 Mensaje:', mensaje);
+      console.log('🔗 URL generada:', whatsappURL);
+
+      window.open(whatsappURL, '_blank');
+    } catch (error) {
+      console.error('❌ Error al preparar envío por WhatsApp:', error);
+      setMensaje('❌ No se pudo generar el PDF para enviar por WhatsApp');
     } finally {
       setCargando(false);
     }
@@ -147,54 +179,69 @@ export default function Historial() {
       )}
 
       <div className="grid gap-4">
-        {cotizaciones.map(c => (
-          <div
-            key={c.id}
-            className="bg-white shadow rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-          >
-            <div>
-              <p><strong>Cliente:</strong> {c.Cliente.nombre}</p>
-              <p><strong>Fecha:</strong> {new Date(c.fecha).toLocaleDateString()}</p>
-              <p><strong>Total:</strong> Q{c.total}</p>
-            </div>
-
-            <div className="flex flex-col md:items-end gap-2">
+        {cotizaciones.map(c => {
+          const telefono = (c.Cliente.telefono || '').toString().trim();
+          return (
+            <div
+              key={c.id}
+              className="bg-white shadow rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+            >
               <div>
-                <label className="block text-sm font-medium mb-1">Estado:</label>
-                <select
-                  value={c.estado}
-                  className="border rounded px-2 py-1"
-                  onChange={e => actualizarEstado(c.id, e.target.value)}
-                >
-                  <option value="pendiente">Pendiente</option>
-                  <option value="entregada">Entregada</option>
-                  <option value="cancelada">Cancelada</option>
-                </select>
+                <p><strong>Cliente:</strong> {c.Cliente.nombre}</p>
+                <p><strong>Teléfono:</strong> {telefono || 'No disponible'}</p>
+                <p><strong>Fecha:</strong> {new Date(c.fecha).toLocaleDateString()}</p>
+                <p><strong>Total:</strong> Q{c.total}</p>
               </div>
 
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handleDescargarPDF(c.id, c.Cliente.nombre)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
-                >
-                  <FaFilePdf /> PDF
-                </button>
-                <button
-                  onClick={() => navigate(`/cotizaciones/editar/${c.id}`)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1"
-                >
-                  <FaPen /> Editar
-                </button>
-                <button
-                  onClick={() => eliminarCotizacion(c.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
-                >
-                  <FaTrash /> Eliminar
-                </button>
+              <div className="flex flex-col md:items-end gap-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Estado:</label>
+                  <select
+                    value={c.estado}
+                    className="border rounded px-2 py-1"
+                    onChange={e => actualizarEstado(c.id, e.target.value)}
+                  >
+                    <option value="pendiente">Pendiente</option>
+                    <option value="entregada">Entregada</option>
+                    <option value="cancelada">Cancelada</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <button
+                    onClick={() => handleDescargarPDF(c.id, c.Cliente.nombre)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
+                  >
+                    <FaFilePdf /> PDF
+                  </button>
+                  <button
+                    onClick={() => handleEnviarWhatsApp(c.id, c.Cliente.nombre, telefono)}
+                    className={`px-3 py-1 rounded flex items-center gap-1 ${
+                      telefono.length >= 8
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    }`}
+                    disabled={telefono.length < 8}
+                  >
+                    <FaWhatsapp /> WhatsApp
+                  </button>
+                  <button
+                    onClick={() => navigate(`/cotizaciones/editar/${c.id}`)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1"
+                  >
+                    <FaPen /> Editar
+                  </button>
+                  <button
+                    onClick={() => eliminarCotizacion(c.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
+                  >
+                    <FaTrash /> Eliminar
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="fixed bottom-6 right-6 flex flex-col gap-4">

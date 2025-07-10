@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
-import { FaSave, FaPlus, FaTrash, FaClipboardList } from 'react-icons/fa';
+import { FaSave, FaPlus, FaTrash, FaClipboardList, FaSpinner } from 'react-icons/fa';
 
 export default function Editar() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [cliente, setCliente] = useState({ nombre: '', nit: '' });
+  const [cliente, setCliente] = useState({
+    nombre: '',
+    nit: '',
+    direccion: '',
+    correo: '',
+    telefono: ''
+  });
   const [clienteId, setClienteId] = useState(null);
   const [observaciones, setObservaciones] = useState('');
   const [productos, setProductos] = useState([]);
   const [mensaje, setMensaje] = useState('');
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -26,7 +33,10 @@ export default function Editar() {
 
         setCliente({
           nombre: cotizacion.Cliente.nombre,
-          nit: cotizacion.Cliente.nit
+          nit: cotizacion.Cliente.nit,
+          direccion: cotizacion.Cliente.direccion || '',
+          correo: cotizacion.Cliente.correo || '',
+          telefono: cotizacion.Cliente.telefono || ''
         });
         setClienteId(cotizacion.Cliente.id);
         setObservaciones(cotizacion.observaciones || '');
@@ -81,8 +91,15 @@ export default function Editar() {
     ]);
   };
 
+  const handleChangeCliente = (campo, valor) => {
+    setCliente({ ...cliente, [campo]: valor });
+  };
+
   const guardarCambios = async () => {
+    setGuardando(true);
     try {
+      await api.put(`/clientes/${clienteId}`, cliente);
+
       const total = productos.reduce((acc, p) => acc + p.total, 0).toFixed(2);
 
       await api.put(`/cotizaciones/${id}`, {
@@ -97,6 +114,8 @@ export default function Editar() {
     } catch (err) {
       console.error(err);
       setMensaje('❌ Error al actualizar cotización');
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -114,8 +133,8 @@ export default function Editar() {
           <input
             type="text"
             value={cliente.nombre}
-            disabled
-            className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-700"
+            onChange={e => handleChangeCliente('nombre', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
         <div>
@@ -123,8 +142,35 @@ export default function Editar() {
           <input
             type="text"
             value={cliente.nit}
-            disabled
-            className="w-full border px-3 py-2 rounded bg-gray-100 text-gray-700"
+            onChange={e => handleChangeCliente('nit', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Dirección</label>
+          <input
+            type="text"
+            value={cliente.direccion}
+            onChange={e => handleChangeCliente('direccion', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Correo</label>
+          <input
+            type="email"
+            value={cliente.correo}
+            onChange={e => handleChangeCliente('correo', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+          <input
+            type="text"
+            value={cliente.telefono}
+            onChange={e => handleChangeCliente('telefono', e.target.value)}
+            className="w-full border px-3 py-2 rounded"
           />
         </div>
         <div>
@@ -203,9 +249,10 @@ export default function Editar() {
 
       <button
         onClick={guardarCambios}
-        className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex justify-center items-center gap-2"
+        disabled={guardando}
+        className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded flex justify-center items-center gap-2 disabled:opacity-70"
       >
-        <FaSave /> Guardar Cambios
+        {guardando ? <FaSpinner className="animate-spin" /> : <FaSave />} Guardar Cambios
       </button>
 
       <div className="fixed bottom-6 right-6">

@@ -23,8 +23,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen px-6 py-12 bg-gradient-to-br from-[#f4f4f4] to-[#dbccc1]">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10">
+    <div className="min-h-screen px-6 py-12 bg-gradient-to-br from-[#002d63] via-[#004f8f] to-[#0077b6] text-white">
+      <h1 className="text-3xl sm:text-4xl font-bold text-white mb-10 text-center">
         Panel de Administración
       </h1>
 
@@ -33,19 +33,20 @@ export default function Dashboard() {
           <div
             key={i}
             onClick={() => navigate(card.route)}
-            className="cursor-pointer bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl border border-gray-200 hover:border-blue-500 transition-all duration-300 group flex flex-col items-center"
+            className="cursor-pointer bg-white rounded-2xl p-8 shadow-md hover:scale-[1.02] transition-transform duration-300 border border-gray-200 group flex flex-col items-center"
           >
             <div className="flex items-center justify-center w-full mb-6">
               <Lottie
                 animationData={card.animation}
                 loop
-                className="w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60"
+                autoplay
+                className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72"
               />
             </div>
             <h2 className="text-xl font-semibold text-gray-800 group-hover:text-blue-800 mb-2 text-center">
               {card.title}
             </h2>
-            <p className="text-gray-500 text-sm text-center">
+            <p className="text-gray-600 text-sm text-center">
               {card.description}
             </p>
           </div>

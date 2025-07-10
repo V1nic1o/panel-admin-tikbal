@@ -4,7 +4,13 @@ import api from '../../../services/api';
 import { FaTrash, FaPlus, FaSave, FaHome } from 'react-icons/fa';
 
 export default function CrearCotizacion() {
-  const [cliente, setCliente] = useState({ nombre: '', nit: '' });
+  const [cliente, setCliente] = useState({
+    nombre: '',
+    nit: '',
+    direccion: '',
+    correo: '',
+    telefono: ''
+  });
   const [observaciones, setObservaciones] = useState('');
   const [productos, setProductos] = useState([
     { descripcion: '', cantidad: '', precioUnitario: '', total: 0, tipo: 'bien' }
@@ -85,7 +91,7 @@ export default function CrearCotizacion() {
         setMensaje('⚠️ Cotización guardada, pero falló la descarga del PDF');
       }
 
-      setCliente({ nombre: '', nit: '' });
+      setCliente({ nombre: '', nit: '', direccion: '', correo: '', telefono: '' });
       setObservaciones('');
       setProductos([{ descripcion: '', cantidad: '', precioUnitario: '', total: 0, tipo: 'bien' }]);
 
@@ -124,6 +130,39 @@ export default function CrearCotizacion() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-gray-700">Dirección</label>
+          <input
+            type="text"
+            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            placeholder="Ej. Zona 1, Ciudad de Guatemala"
+            value={cliente.direccion}
+            onChange={e => setCliente({ ...cliente, direccion: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Correo electrónico</label>
+          <input
+            type="email"
+            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            placeholder="Ej. cliente@email.com"
+            value={cliente.correo}
+            onChange={e => setCliente({ ...cliente, correo: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+          <input
+            type="tel"
+            className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
+            placeholder="Ej. 55555555"
+            value={cliente.telefono}
+            onChange={e => setCliente({ ...cliente, telefono: e.target.value })}
+          />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-gray-700">Observaciones</label>
           <textarea
             rows={3}
@@ -135,6 +174,7 @@ export default function CrearCotizacion() {
         </div>
       </div>
 
+      {/* Productos */}
       <div className="bg-white p-6 rounded shadow mb-6">
         <h3 className="text-xl font-semibold mb-4">Productos</h3>
         {productos.map((p, index) => (
