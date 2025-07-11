@@ -69,7 +69,7 @@ export default function Historial() {
     }
   };
 
-  const handleEnviarWhatsApp = async (id, nombreCliente, telefono) => {
+  const handleEnviarWhatsApp = (id, nombreCliente, telefono) => {
     const numeroLimpio = (telefono || '').toString().replace(/\D/g, '');
     console.log('☎️ Número limpio:', numeroLimpio);
 
@@ -79,24 +79,29 @@ export default function Historial() {
       return;
     }
 
+    const nuevaVentana = window.open('', '_blank');
+
     setCargando(true);
-    try {
-      const res = await api.get(`/cotizaciones/pdf/${id}`);
-      const pdfURL = res.data.url;
+    api.get(`/cotizaciones/pdf/${id}`)
+      .then(res => {
+        const pdfURL = res.data.url;
+        const mensaje = `Hola ${nombreCliente}, te comparto la cotización solicitada: ${pdfURL}`;
+        const whatsappURL = `https://wa.me/502${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
 
-      const mensaje = `Hola ${nombreCliente}, te comparto la cotización solicitada: ${pdfURL}`;
-      const whatsappURL = `https://wa.me/502${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+        console.log('📩 Mensaje:', mensaje);
+        console.log('🔗 URL generada:', whatsappURL);
 
-      console.log('📩 Mensaje:', mensaje);
-      console.log('🔗 URL generada:', whatsappURL);
-
-      window.open(whatsappURL, '_blank');
-    } catch (error) {
-      console.error('❌ Error al preparar envío por WhatsApp:', error);
-      setMensaje('❌ No se pudo generar el PDF para enviar por WhatsApp');
-    } finally {
-      setCargando(false);
-    }
+        if (nuevaVentana) {
+          nuevaVentana.location.href = whatsappURL;
+        } else {
+          window.open(whatsappURL, '_blank');
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error al preparar envío por WhatsApp:', error);
+        setMensaje('❌ No se pudo generar el PDF para enviar por WhatsApp');
+      })
+      .finally(() => setCargando(false));
   };
 
   const actualizarEstado = async (id, nuevoEstado) => {
