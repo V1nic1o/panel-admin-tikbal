@@ -50,7 +50,7 @@ export default function Login() {
 
       <div className={`bg-white rounded-xl shadow-lg p-8 w-full max-w-md ${loading ? 'opacity-40 pointer-events-none' : ''}`}>
         <h2 className="text-2xl font-bold text-center text-primary mb-6">
-          Panel Administrativo
+          Login
         </h2>
 
         {error && (

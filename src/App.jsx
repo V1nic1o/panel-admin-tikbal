@@ -9,7 +9,7 @@ import Login from './pages/Auth/Login';
 import ProtectedRoute from './routes/ProtectedRoute';
 import { LoaderProvider } from './services/LoaderContext';
 
-// ✅ Vistas del módulo Cotizaciones
+// ✅ Módulo Cotizaciones
 import ControlCotizaciones from './pages/Cotizaciones/Control/ControlCotizaciones';
 import Crear from './pages/Cotizaciones/Crear/Crear';
 import Editar from './pages/Cotizaciones/Editar/Editar';
@@ -38,14 +38,14 @@ function App() {
           <Route path="proyectos" element={<Proyectos />} />
           <Route path="mensajes" element={<Mensajes />} />
 
-          {/* ✅ Ruta intermedia con cartas */}
+          {/* ✅ Cotizaciones */}
           <Route path="cotizaciones" element={<ControlCotizaciones />} />
           <Route path="cotizaciones/crear" element={<Crear />} />
           <Route path="cotizaciones/editar/:id" element={<Editar />} />
           <Route path="cotizaciones/historial" element={<Historial />} />
         </Route>
 
-        {/* 🚧 Fallback para rutas no válidas */}
+        {/* 🔁 Redirección para rutas no válidas */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </LoaderProvider>

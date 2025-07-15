@@ -8,7 +8,12 @@ export default function Servicios() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [servicioEditando, setServicioEditando] = useState(null);
   const [servicios, setServicios] = useState([]);
-  const [nuevoServicio, setNuevoServicio] = useState({ nombre: '', descripcion: '', imagenes: [], imagenesActuales: [] });
+  const [nuevoServicio, setNuevoServicio] = useState({
+    nombre: '',
+    descripcion: '',
+    imagenes: [],
+    imagenesActuales: []
+  });
 
   useEffect(() => {
     api.get('/servicios').then((res) => setServicios(res.data));
@@ -18,7 +23,11 @@ export default function Servicios() {
     if (servicio) {
       setModoEdicion(true);
       setServicioEditando(servicio);
-      setNuevoServicio({ ...servicio, imagenes: [], imagenesActuales: servicio.imagenes || [] });
+      setNuevoServicio({
+        ...servicio,
+        imagenes: [],
+        imagenesActuales: servicio.imagenes || []
+      });
     } else {
       setModoEdicion(false);
       setNuevoServicio({ nombre: '', descripcion: '', imagenes: [], imagenesActuales: [] });
@@ -35,7 +44,10 @@ export default function Servicios() {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'imagenes') {
-      setNuevoServicio((prev) => ({ ...prev, imagenes: [...prev.imagenes, ...Array.from(files)] }));
+      setNuevoServicio((prev) => ({
+        ...prev,
+        imagenes: [...prev.imagenes, ...Array.from(files)]
+      }));
     } else {
       setNuevoServicio((prev) => ({ ...prev, [name]: value }));
     }
@@ -44,23 +56,15 @@ export default function Servicios() {
   const eliminarImagenActual = (index) => {
     setNuevoServicio((prev) => ({
       ...prev,
-      imagenesActuales: prev.imagenesActuales.filter((_, i) => i !== index),
+      imagenesActuales: prev.imagenesActuales.filter((_, i) => i !== index)
     }));
   };
 
   const eliminarImagenNueva = (index) => {
     setNuevoServicio((prev) => ({
       ...prev,
-      imagenes: prev.imagenes.filter((_, i) => i !== index),
+      imagenes: prev.imagenes.filter((_, i) => i !== index)
     }));
-  };
-
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(nuevoServicio.imagenesActuales);
-    const [reordered] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reordered);
-    setNuevoServicio((prev) => ({ ...prev, imagenesActuales: items }));
   };
 
   const handleSubmit = async (e) => {
@@ -95,14 +99,14 @@ export default function Servicios() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-          <FaLeaf /> Gestión de Servicios
+        <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+          <FaLeaf className="text-green-600" /> Gestión de Servicios
         </h2>
         <button
           onClick={() => abrirModal()}
-          className="flex items-center bg-primary text-white px-4 py-2 rounded-md hover:opacity-90"
+          className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           <FaPlus className="mr-2" /> Nuevo Servicio
         </button>
@@ -114,23 +118,23 @@ export default function Servicios() {
             key={serv.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-4 shadow rounded-md border border-gray-100 hover:shadow-md relative"
+            className="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition"
           >
-            <h3 className="text-lg font-semibold text-secondary mb-2">{serv.nombre}</h3>
-            <p className="text-gray-600 text-sm mb-2">{serv.descripcion}</p>
+            <h3 className="text-lg font-semibold text-blue-800 mb-1">{serv.nombre}</h3>
+            <p className="text-gray-600 text-sm mb-3">{serv.descripcion}</p>
             {serv.imagenes?.length > 0 && (
-              <div className="flex gap-2 flex-wrap mb-2">
+              <div className="flex gap-2 flex-wrap mb-3">
                 {serv.imagenes.map((url, i) => (
                   <img
                     key={i}
                     src={url}
                     alt="servicio"
-                    className="w-16 h-16 object-cover rounded"
+                    className="w-16 h-16 object-cover rounded-md border"
                   />
                 ))}
               </div>
             )}
-            <div className="flex justify-end gap-2 mt-2">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => abrirModal(serv)}
                 className="text-blue-600 hover:underline text-sm flex items-center gap-1"
@@ -148,17 +152,16 @@ export default function Servicios() {
         ))}
       </div>
 
-      {/* MODAL */}
       <AnimatePresence>
         {modalAbierto && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative"
+              className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg relative"
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
@@ -170,7 +173,7 @@ export default function Servicios() {
               >
                 <FaTimes />
               </button>
-              <h3 className="text-xl font-semibold text-primary mb-4">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">
                 {modoEdicion ? 'Editar Servicio' : 'Nuevo Servicio'}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -193,12 +196,11 @@ export default function Servicios() {
                   className="w-full border border-gray-300 rounded-md p-3"
                 ></textarea>
 
-                {/* Imágenes actuales con opción de eliminar */}
                 {nuevoServicio.imagenesActuales?.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     {nuevoServicio.imagenesActuales.map((img, i) => (
                       <div key={i} className="relative">
-                        <img src={img} className="w-16 h-16 rounded object-cover" />
+                        <img src={img} className="w-16 h-16 rounded object-cover border" />
                         <button
                           type="button"
                           onClick={() => eliminarImagenActual(i)}
@@ -209,12 +211,14 @@ export default function Servicios() {
                   </div>
                 )}
 
-                {/* Imágenes nuevas */}
                 {nuevoServicio.imagenes.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     {nuevoServicio.imagenes.map((file, i) => (
                       <div key={i} className="relative">
-                        <img src={URL.createObjectURL(file)} className="w-16 h-16 rounded object-cover" />
+                        <img
+                          src={URL.createObjectURL(file)}
+                          className="w-16 h-16 rounded object-cover border"
+                        />
                         <button
                           type="button"
                           onClick={() => eliminarImagenNueva(i)}
@@ -234,7 +238,7 @@ export default function Servicios() {
                 />
                 <button
                   type="submit"
-                  className="w-full bg-primary text-white py-2 rounded-md font-semibold hover:opacity-90"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
                   {modoEdicion ? 'Guardar Cambios' : 'Guardar'}
                 </button>
