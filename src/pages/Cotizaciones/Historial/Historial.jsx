@@ -1,4 +1,3 @@
-// src/pages/Cotizaciones/Historial/Historial.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
@@ -11,6 +10,7 @@ import {
   FaSpinner,
   FaWhatsapp,
 } from 'react-icons/fa';
+import AccionBurbuja from '../../../components/AccionBurbuja/AccionBurbuja';
 
 export default function Historial() {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -117,8 +117,6 @@ export default function Historial() {
   };
 
   const eliminarCotizacion = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta cotización?')) return;
-
     setCargando(true);
     try {
       await api.delete(`/cotizaciones/${id}`);
@@ -213,35 +211,35 @@ export default function Historial() {
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <button
-                    onClick={() => handleDescargarPDF(c.id, c.Cliente.nombre)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
-                  >
-                    <FaFilePdf /> PDF
-                  </button>
-                  <button
-                    onClick={() => handleEnviarWhatsApp(c.id, c.Cliente.nombre, telefono)}
-                    className={`px-3 py-1 rounded flex items-center gap-1 ${
-                      telefono.length >= 8
-                        ? 'bg-green-500 hover:bg-green-600 text-white'
-                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                    }`}
+                  <AccionBurbuja
+                    onConfirm={() => handleDescargarPDF(c.id, c.Cliente.nombre)}
+                    icon={FaFilePdf}
+                    color="bg-blue-500 hover:bg-blue-600"
+                    title="Descargar PDF"
+                    descripcion="Se descargará el archivo PDF correspondiente a esta cotización."
+                  />
+                  <AccionBurbuja
+                    onConfirm={() => handleEnviarWhatsApp(c.id, c.Cliente.nombre, telefono)}
+                    icon={FaWhatsapp}
+                    color={telefono.length >= 8 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300'}
+                    title="Enviar por WhatsApp"
+                    descripcion="Se abrirá WhatsApp y se enviará esta cotización al cliente."
                     disabled={telefono.length < 8}
-                  >
-                    <FaWhatsapp /> WhatsApp
-                  </button>
-                  <button
-                    onClick={() => navigate(`/cotizaciones/editar/${c.id}`)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 flex items-center gap-1"
-                  >
-                    <FaPen /> Editar
-                  </button>
-                  <button
-                    onClick={() => eliminarCotizacion(c.id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
-                  >
-                    <FaTrash /> Eliminar
-                  </button>
+                  />
+                  <AccionBurbuja
+                    onConfirm={() => navigate(`/cotizaciones/editar/${c.id}`)}
+                    icon={FaPen}
+                    color="bg-yellow-500 hover:bg-yellow-600"
+                    title="Editar cotización"
+                    descripcion="Serás redirigido al formulario para editar esta cotización."
+                  />
+                  <AccionBurbuja
+                    onConfirm={() => eliminarCotizacion(c.id)}
+                    icon={FaTrash}
+                    color="bg-red-600 hover:bg-red-700"
+                    title="Eliminar cotización"
+                    descripcion="Esta cotización será eliminada de forma permanente."
+                  />
                 </div>
               </div>
             </div>
