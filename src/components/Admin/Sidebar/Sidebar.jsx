@@ -1,24 +1,18 @@
+// src/components/Admin/Sidebar/Sidebar.jsx (modularizado)
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  HiHome,
-  HiLogout,
-  HiX,
-  HiArrowLeft,
-  HiCog,
-  HiDocumentText,
-  HiOutlineClipboardList,
-  HiOutlineCollection,
-  HiOutlineChatAlt,
-  HiChevronDown,
-  HiChevronUp,
-} from 'react-icons/hi';
-import { useState } from 'react';
+import { HiX, HiArrowLeft, HiHome, HiLogout } from 'react-icons/hi';
 import clsx from 'clsx';
+import { useState } from 'react';
 import logo from '../../../assets/logo-tikbal.jpg';
+
+import ControlWebSection from './sections/ControlWebSection';
+import CotizacionesSection from './sections/CotizacionesSection';
+import JardinesLink from './sections/JardinesLink';
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [openWeb, setOpenWeb] = useState(false);
   const [openCotizaciones, setOpenCotizaciones] = useState(false);
 
@@ -35,7 +29,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <>
-      {/* Fondo oscuro en móviles cuando sidebar está abierto */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -43,7 +36,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         />
       )}
 
-      {/* Sidebar principal */}
       <aside
         className={clsx(
           'fixed top-0 left-0 h-screen w-72 bg-white z-50 shadow-lg border-r border-gray-200',
@@ -52,7 +44,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           'lg:translate-x-0'
         )}
       >
-        {/* 🔷 Logo y botón de cierre */}
+        {/* Logo */}
         <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100">
           <div className="flex items-center gap-2">
             <img src={logo} alt="Logo" className="w-8 h-8 rounded-md shadow-sm" />
@@ -63,7 +55,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </button>
         </div>
 
-        {/* Navegación principal */}
+        {/* Navegación */}
         <nav className="flex flex-col gap-1 px-4 py-6 flex-1 text-sm font-medium overflow-y-auto">
           <button
             onClick={goBack}
@@ -86,106 +78,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             Inicio
           </button>
 
-          {/* Control Web */}
-          <div>
-            <button
-              onClick={() => setOpenWeb(!openWeb)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 transition text-gray-700"
-            >
-              <span className="flex items-center gap-2">
-                <HiCog className="text-purple-500" />
-                Control Web
-              </span>
-              {openWeb ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
-
-            {openWeb && (
-              <div className="ml-5 mt-1 flex flex-col gap-1">
-                <button
-                  onClick={() => navigate('/servicios')}
-                  className={clsx(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                    isActive('/servicios')
-                      ? 'bg-purple-50 text-purple-700 font-semibold'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <HiOutlineCollection className="text-purple-500" />
-                  Servicios
-                </button>
-                <button
-                  onClick={() => navigate('/proyectos')}
-                  className={clsx(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                    isActive('/proyectos')
-                      ? 'bg-purple-50 text-purple-700 font-semibold'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <HiDocumentText className="text-purple-500" />
-                  Proyectos
-                </button>
-                <button
-                  onClick={() => navigate('/mensajes')}
-                  className={clsx(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                    isActive('/mensajes')
-                      ? 'bg-purple-50 text-purple-700 font-semibold'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <HiOutlineChatAlt className="text-purple-500" />
-                  Mensajes
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Cotizaciones */}
-          <div>
-            <button
-              onClick={() => setOpenCotizaciones(!openCotizaciones)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 transition text-gray-700"
-            >
-              <span className="flex items-center gap-2">
-                <HiOutlineClipboardList className="text-yellow-500" />
-                Cotizaciones
-              </span>
-              {openCotizaciones ? <HiChevronUp /> : <HiChevronDown />}
-            </button>
-
-            {openCotizaciones && (
-              <div className="ml-5 mt-1 flex flex-col gap-1">
-                <button
-                  onClick={() => navigate('/cotizaciones/crear')}
-                  className={clsx(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                    isActive('/cotizaciones/crear')
-                      ? 'bg-yellow-50 text-yellow-700 font-semibold'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <HiDocumentText className="text-yellow-500" />
-                  Nueva Cotización
-                </button>
-                <button
-                  onClick={() => navigate('/cotizaciones/historial')}
-                  className={clsx(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg',
-                    isActive('/cotizaciones/historial')
-                      ? 'bg-yellow-50 text-yellow-700 font-semibold'
-                      : 'hover:bg-gray-50 text-gray-600'
-                  )}
-                >
-                  <HiOutlineClipboardList className="text-yellow-500" />
-                  Historial
-                </button>
-              </div>
-            )}
-          </div>
+          <ControlWebSection open={openWeb} setOpen={setOpenWeb} isActive={isActive} navigate={navigate} />
+          <CotizacionesSection open={openCotizaciones} setOpen={setOpenCotizaciones} isActive={isActive} navigate={navigate} />
+          <JardinesLink isActive={isActive} navigate={navigate} />
         </nav>
 
-        {/* Botón de cerrar sesión */}
+        {/* Cerrar sesión */}
         <div className="px-6 py-4 border-t border-gray-100">
           <button
             onClick={cerrarSesion}

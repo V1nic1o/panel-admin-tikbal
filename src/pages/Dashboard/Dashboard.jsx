@@ -3,6 +3,7 @@ import Lottie from 'lottie-react';
 
 import controlWebAnim from '../../assets/animations/control web.json';
 import cotizacionesAnim from '../../assets/animations/cotizaciones.json';
+import jardinesAnim from '../../assets/animations/jardines.json'; // ✅ animación representativa del módulo de jardines
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,6 +20,12 @@ export default function Dashboard() {
       description: 'Crear, editar y administrar cotizaciones',
       animation: cotizacionesAnim,
       route: '/cotizaciones',
+    },
+    {
+      title: 'Administración de Jardines',
+      description: 'Gestionar usuarios, jardines, secciones y tareas',
+      animation: jardinesAnim,
+      route: '/jardines',
     },
   ];
 
