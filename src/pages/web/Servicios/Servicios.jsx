@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTimes, FaTrash, FaEdit, FaLeaf } from 'react-icons/fa';
-import api from '../../services/api';
+import api from '../../../services/api';
 
 export default function Servicios() {
   const [modalAbierto, setModalAbierto] = useState(false);

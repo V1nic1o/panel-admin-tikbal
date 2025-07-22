@@ -5,32 +5,61 @@ import {
   HiOutlineChatAlt,
   HiChevronDown,
   HiChevronUp,
+  HiOutlineViewGrid,
 } from 'react-icons/hi';
 import clsx from 'clsx';
+import { useState } from 'react';
 
-export default function ControlWebSection({ open, setOpen, isActive, navigate }) {
+export default function ControlWebSection({ isActive, navigate }) {
+  const [open, setOpen] = useState(
+    ['/control-web', '/servicios', '/proyectos', '/mensajes'].some(path =>
+      window.location.pathname.startsWith(path)
+    )
+  );
+
   return (
-    <div>
+    <div className="w-full">
+      {/* Botón principal Control Web */}
       <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 transition text-gray-700"
+        onClick={() => setOpen(prev => !prev)}
+        className={clsx(
+          'flex items-center justify-between w-full px-3 py-2 rounded-lg transition',
+          ['/control-web', '/servicios', '/proyectos', '/mensajes'].some(path =>
+            window.location.pathname.startsWith(path)
+          )
+            ? 'bg-purple-50 text-purple-700 font-semibold shadow'
+            : 'hover:bg-gray-50 text-gray-700'
+        )}
       >
-        <span className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <HiCog className="text-purple-500" />
           Control Web
-        </span>
+        </div>
         {open ? <HiChevronUp /> : <HiChevronDown />}
       </button>
 
+      {/* Submenú */}
       {open && (
-        <div className="ml-5 mt-1 flex flex-col gap-1">
+        <div className="ml-6 mt-2 space-y-1 text-sm">
+          <button
+            onClick={() => navigate('/control-web')}
+            className={clsx(
+              'flex items-center gap-2 w-full text-left px-3 py-1.5 rounded transition',
+              isActive('/control-web')
+                ? 'bg-purple-100 text-purple-700 font-semibold'
+                : 'hover:bg-gray-100 text-gray-700'
+            )}
+          >
+            <HiOutlineViewGrid className="text-purple-500" />
+            Panel del sitio web
+          </button>
           <button
             onClick={() => navigate('/servicios')}
             className={clsx(
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg',
+              'flex items-center gap-2 w-full text-left px-3 py-1.5 rounded transition',
               isActive('/servicios')
-                ? 'bg-purple-50 text-purple-700 font-semibold'
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-purple-100 text-purple-700 font-semibold'
+                : 'hover:bg-gray-100 text-gray-700'
             )}
           >
             <HiOutlineCollection className="text-purple-500" />
@@ -39,10 +68,10 @@ export default function ControlWebSection({ open, setOpen, isActive, navigate })
           <button
             onClick={() => navigate('/proyectos')}
             className={clsx(
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg',
+              'flex items-center gap-2 w-full text-left px-3 py-1.5 rounded transition',
               isActive('/proyectos')
-                ? 'bg-purple-50 text-purple-700 font-semibold'
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-purple-100 text-purple-700 font-semibold'
+                : 'hover:bg-gray-100 text-gray-700'
             )}
           >
             <HiDocumentText className="text-purple-500" />
@@ -51,10 +80,10 @@ export default function ControlWebSection({ open, setOpen, isActive, navigate })
           <button
             onClick={() => navigate('/mensajes')}
             className={clsx(
-              'flex items-center gap-2 px-3 py-1.5 rounded-lg',
+              'flex items-center gap-2 w-full text-left px-3 py-1.5 rounded transition',
               isActive('/mensajes')
-                ? 'bg-purple-50 text-purple-700 font-semibold'
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'bg-purple-100 text-purple-700 font-semibold'
+                : 'hover:bg-gray-100 text-gray-700'
             )}
           >
             <HiOutlineChatAlt className="text-purple-500" />

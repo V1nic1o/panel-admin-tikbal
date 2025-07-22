@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTrash, FaEye, FaTimes } from 'react-icons/fa';
-import api from '../../services/api';
+import api from '../../../services/api';
 
 export default function Mensajes() {
   const [mensajes, setMensajes] = useState([]);

@@ -1,13 +1,12 @@
 // src/components/Admin/Jardines/Usuarios/ModalConfirmacion.jsx
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
-import {
-  HiTrash,
-  HiBan,
-  HiX,
-} from 'react-icons/hi';
+import { Fragment, useState } from 'react';
+import { HiTrash, HiBan, HiX } from 'react-icons/hi';
+import api from '../../../../services/api';
 
-export default function ModalConfirmacion({ isOpen, onClose, tipo, usuario }) {
+export default function ModalConfirmacion({ isOpen, onClose, tipo, usuario, onConfirmado }) {
+  const [isLoading, setIsLoading] = useState(false);
+
   const obtenerMensaje = () => {
     if (!usuario) return '';
     if (tipo === 'eliminar') {
@@ -16,24 +15,47 @@ export default function ModalConfirmacion({ isOpen, onClose, tipo, usuario }) {
     if (tipo === 'deshabilitar') {
       return `¿Deseas deshabilitar a "${usuario.nombre}" temporalmente? Podrás volver a activarlo más adelante.`;
     }
+    if (tipo === 'activar') {
+      return `¿Deseas volver a activar a "${usuario.nombre}"?`;
+    }
     return '';
   };
 
-  const handleConfirmar = () => {
-    console.log(`✅ Acción confirmada: ${tipo} a`, usuario);
-    onClose();
+  const handleConfirmar = async () => {
+    if (!usuario) return;
+    setIsLoading(true);
+
+    try {
+      if (tipo === 'eliminar') {
+        await api.delete(`/usuarios/${usuario.id}`);
+      }
+
+      if (tipo === 'deshabilitar' || tipo === 'activar') {
+        await api.patch(`/usuarios/estado/${usuario.id}`);
+      }
+
+      onConfirmado?.(); // 🔄 Notificar al componente padre si desea recargar
+    } catch (error) {
+      alert('Error al ejecutar la acción');
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
   };
 
-  const iconoAccion =
-    tipo === 'eliminar' ? (
-      <div className="flex justify-center">
-        <HiTrash className="text-red-500 text-5xl mb-4" />
-      </div>
-    ) : (
-      <div className="flex justify-center">
-        <HiBan className="text-yellow-500 text-5xl mb-4" />
-      </div>
-    );
+  const iconoAccion = tipo === 'eliminar' ? (
+    <div className="flex justify-center">
+      <HiTrash className="text-red-500 text-5xl mb-4" />
+    </div>
+  ) : (
+    <div className="flex justify-center">
+      <HiBan
+        className={`text-5xl mb-4 ${
+          tipo === 'activar' ? 'text-green-500' : 'text-yellow-500'
+        }`}
+      />
+    </div>
+  );
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -70,7 +92,7 @@ export default function ModalConfirmacion({ isOpen, onClose, tipo, usuario }) {
                 <HiX className="text-xl" />
               </button>
 
-              {/* Ícono central */}
+              {/* Ícono */}
               {iconoAccion}
 
               {/* Texto */}
@@ -83,19 +105,23 @@ export default function ModalConfirmacion({ isOpen, onClose, tipo, usuario }) {
               <div className="flex justify-center gap-4">
                 <button
                   onClick={onClose}
+                  disabled={isLoading}
                   className="text-gray-700 hover:underline font-medium"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleConfirmar}
+                  disabled={isLoading}
                   className={`px-5 py-2 rounded-md text-white font-semibold shadow ${
                     tipo === 'eliminar'
                       ? 'bg-red-600 hover:bg-red-700'
+                      : tipo === 'activar'
+                      ? 'bg-green-600 hover:bg-green-700'
                       : 'bg-yellow-500 hover:bg-yellow-600'
                   }`}
                 >
-                  Confirmar
+                  {isLoading ? 'Procesando...' : 'Confirmar'}
                 </button>
               </div>
             </Dialog.Panel>

@@ -1,8 +1,7 @@
-// src/pages/Auth/Login.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaLock, FaUser } from 'react-icons/fa';
-import { ImSpinner8 } from 'react-icons/im'; // Spinner
+import { ImSpinner8 } from 'react-icons/im';
 import api, { setAuthToken } from '../../services/api';
 
 export default function Login() {
@@ -28,7 +27,20 @@ export default function Login() {
       const token = res.data.token;
       localStorage.setItem('token', token);
       setAuthToken(token);
-      navigate('/dashboard');
+
+      // 🔍 Decodificar token para obtener el rol
+      const payloadBase64 = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payloadBase64));
+      const rol = decodedPayload.rol;
+
+      // 🔁 Redirigir según rol
+      if (rol === 'admin') {
+        navigate('/dashboard');
+      } else if (rol === 'jardinero') {
+        navigate('/jardinero');
+      } else {
+        setError('Rol no autorizado');
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError('Correo o contraseña incorrectos');

@@ -1,16 +1,31 @@
-import { useState } from 'react';
-import { HiUpload, HiX, HiOutlineSparkles } from 'react-icons/hi';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment, useState } from 'react';
+import { HiOutlineSparkles, HiX } from 'react-icons/hi';
 import { FaSpinner } from 'react-icons/fa';
+import ImagenUploader from './partials/ImagenUploader';
+import InfoJardin from './partials/InfoJardin';
+import InfoCliente from './partials/InfoCliente';
 
-export default function CrearJardin() {
+export default function CrearJardin({ isOpen, onClose }) {
   const [imagen, setImagen] = useState(null);
   const [cargando, setCargando] = useState(false);
 
-  const handleImagen = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImagen(URL.createObjectURL(file));
-    }
+  const [form, setForm] = useState({
+    nombre: '',
+    descripcion: '',
+    cliente: '',
+    nit: '',
+    direccion: '',
+    correo: '',
+    telefono: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -19,109 +34,91 @@ export default function CrearJardin() {
     setTimeout(() => {
       setCargando(false);
       alert('Jardín guardado (simulado)');
+      onClose();
+      setForm({
+        nombre: '',
+        descripcion: '',
+        cliente: '',
+        nit: '',
+        direccion: '',
+        correo: '',
+        telefono: '',
+      });
+      setImagen(null);
     }, 1500);
   };
 
   return (
-    <div className="p-6 md:p-10 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        <div className="mb-6 flex items-center gap-3">
-          <HiOutlineSparkles className="text-3xl text-pink-400" />
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-1">Crear Jardín</h1>
-            <p className="text-gray-500 text-sm">
-              Completa los siguientes campos para registrar un nuevo jardín.
-            </p>
-          </div>
-        </div>
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
+        {/* Fondo oscuro con desenfoque */}
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-200"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+        </Transition.Child>
 
-        <form className="space-y-8" onSubmit={handleSubmit}>
-          {/* Imagen */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Imagen aérea del jardín
-            </label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg border border-blue-300 hover:bg-blue-200 transition">
-                <HiUpload className="text-xl" />
-                <span>Subir imagen</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImagen}
-                />
-              </label>
-              {imagen && (
-                <div className="relative w-40 h-40 rounded overflow-hidden border">
-                  <img src={imagen} alt="Vista previa" className="object-cover w-full h-full" />
+        {/* Panel modal compacto y centrado */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-200"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-150"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            <Dialog.Panel className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6 relative">
+              {/* Botón cerrar */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 text-red-400 hover:text-red-600 transition"
+              >
+                <HiX className="text-2xl sm:text-3xl" />
+              </button>
+
+              {/* Encabezado */}
+              <div className="flex items-center gap-3 mb-4">
+                <HiOutlineSparkles className="text-2xl text-green-600" />
+                <Dialog.Title className="text-lg font-semibold text-gray-800">
+                  Crear Jardín
+                </Dialog.Title>
+              </div>
+
+              {/* Formulario vertical compacto */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <ImagenUploader imagen={imagen} setImagen={setImagen} />
+                <InfoJardin form={form} handleChange={handleChange} vertical />
+                <InfoCliente form={form} handleChange={handleChange} vertical />
+
+                <div className="pt-2 flex justify-end">
                   <button
-                    type="button"
-                    className="absolute top-1 right-1 bg-white/80 hover:bg-white rounded-full p-1 text-red-500"
-                    onClick={() => setImagen(null)}
+                    type="submit"
+                    disabled={cargando}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-lg shadow flex items-center gap-2"
                   >
-                    <HiX className="text-lg" />
+                    {cargando ? (
+                      <>
+                        <FaSpinner className="animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar jardín'
+                    )}
                   </button>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Jardín info */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del jardín</label>
-              <input type="text" placeholder="Ej. Jardín Central" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-              <input type="text" placeholder="Breve descripción del jardín" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-          </div>
-
-          {/* Cliente info */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Cliente</label>
-              <input type="text" placeholder="Ej. Municipalidad de Antigua" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">NIT</label>
-              <input type="text" placeholder="Ej. 1234567" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-              <input type="text" placeholder="Ej. Zona 1, Ciudad de Guatemala" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
-              <input type="email" placeholder="Ej. cliente@email.com" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-              <input type="tel" placeholder="Ej. 55555555" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400" />
-            </div>
-          </div>
-
-          {/* Botón */}
-          <div className="pt-4 flex justify-end">
-            <button
-              type="submit"
-              disabled={cargando}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg shadow flex items-center gap-2"
-            >
-              {cargando ? (
-                <>
-                  <FaSpinner className="animate-spin" />
-                  Guardando...
-                </>
-              ) : (
-                'Guardar jardín'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              </form>
+            </Dialog.Panel>
+          </Transition.Child>
+        </div>
+      </Dialog>
+    </Transition>
   );
 }
