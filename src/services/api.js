@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // ✅ Instancia de Axios con baseURL definida
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://backend-tikbal.onrender.com/api',
 });
 
 // ✅ Cargar token al iniciar si existe
